@@ -16,7 +16,7 @@ REM Merge the main branch into the release branch
 git merge %MAIN_BRANCH%
 
 REM Optional: Push the changes to the remote release branch
-REM git push origin %RELEASE_BRANCH%
+git push origin %RELEASE_BRANCH%
 
 echo Merged changes from %MAIN_BRANCH% to %RELEASE_BRANCH%
 endlocal
