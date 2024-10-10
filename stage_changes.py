@@ -1,31 +1,30 @@
-import subprocess
+#pip install GitPython
+import os
+import git
 
-def stage_files_from_txt(txt_file):
-    # Read the file names from the txt file and print them for debugging
-    with open(txt_file, 'r') as f:
-        file_names = f.read().splitlines()
-        print("File names read from txt file:")
-        for file_name in file_names:
-            print(file_name)
-    
-    # Get the list of changed files
-    result = subprocess.run(['git', 'status', '--porcelain'], capture_output=True, text=True)
-    changed_files = result.stdout.splitlines()
-    print("\nChanged files:")
-    for line in changed_files:
-        print(line)
-    
-    # Stage the files that match the names in the txt file
-    for line in changed_files:
-        status, file_name = line[:2], line[3:]
-        if file_name in file_names:
-            subprocess.run(['git', 'add', file_name])
-            print(f"Staged: {file_name}")
-        else:
-            print(f"Not staged: {file_name}")
+# Set repository path (current directory in this case)
+repo_path = '.'
 
-# Specify the path to the txt file containing the file names
-txt_file = 'files_to_stage.txt'
+# Path to the .txt file that contains the list of relative paths
+txt_file_path = 'files_to_stage.txt'
 
-# Stage the files
-stage_files_from_txt(txt_file)
+# Open the .txt file and extract just the file names
+with open(txt_file_path, 'r') as f:
+    files_to_stage = [os.path.basename(line.strip()) for line in f.readlines()]
+
+# Initialize repository object
+repo = git.Repo(repo_path)
+
+# Fetch all changes (even uncommitted ones)
+# 'untracked', 'index.diff(None)' to get all modified, added, deleted files
+changed_files = [item.a_path for item in repo.index.diff(None)] + repo.untracked_files
+
+# Compare and stage only files whose basenames are listed in the .txt file
+for file in changed_files:
+    # Extract the basename from the full path and check if it's in the list
+    if os.path.basename(file) in files_to_stage:
+        print(f'Staging file: {file}')
+        repo.git.add(file)
+
+# You can also commit staged changes with a message if needed:
+# repo.git.commit('-m', 'Staging specific files based on .txt list')
