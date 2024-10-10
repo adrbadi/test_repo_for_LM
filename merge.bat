@@ -2,8 +2,8 @@
 setlocal
 
 REM Define the branches
-set MAIN_BRANCH=main
-set RELEASE_BRANCH=release
+set MAIN_BRANCH=DEVELOPMENT_1
+set RELEASE_BRANCH=main
 
 REM Checkout the main branch and pull the latest changes
 git checkout %MAIN_BRANCH%
